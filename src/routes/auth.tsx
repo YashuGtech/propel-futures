@@ -58,12 +58,12 @@ function AuthPage() {
 
         <form onSubmit={submit} className="mt-6 space-y-3">
           {mode === "signup" && (
-            <Field icon={User} placeholder="Full name" value={form.name} onChange={(v) => setForm({ ...form, name: v })} />
+            <Field icon={User} placeholder="Full name" value={form.name} onChange={(v: string) => setForm({ ...form, name: v })} />
           )}
-          <Field icon={Mail} type="email" required placeholder="you@example.com" value={form.email} onChange={(v) => setForm({ ...form, email: v })} />
-          <Field icon={Lock} type="password" required placeholder="Password (min 6)" value={form.password} onChange={(v) => setForm({ ...form, password: v })} />
+          <Field icon={Mail} type="email" required placeholder="you@example.com" value={form.email} onChange={(v: string) => setForm({ ...form, email: v })} />
+          <Field icon={Lock} type="password" required placeholder="Password (min 6)" value={form.password} onChange={(v: string) => setForm({ ...form, password: v })} />
           {mode === "signup" && (
-            <Field icon={Sparkles} placeholder="Referral code (optional)" value={form.ref} onChange={(v) => setForm({ ...form, ref: v })} />
+            <Field icon={Sparkles} placeholder="Referral code (optional)" value={form.ref} onChange={(v: string) => setForm({ ...form, ref: v })} />
           )}
           <button type="submit" className="w-full py-3 rounded-xl gradient-cyan-violet text-background font-semibold glow-cyan">
             {mode === "signup" ? "Create account & claim $100" : "Log in"}
