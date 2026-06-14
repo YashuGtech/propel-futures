@@ -1,3 +1,4 @@
+import { useShallow } from "zustand/react/shallow";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { motion } from "framer-motion";
 import { StatCard } from "@/components/app-shell";

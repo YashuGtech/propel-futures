@@ -1,3 +1,4 @@
+import { useShallow } from "zustand/react/shallow";
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { INSTRUMENTS } from "@/lib/mock-data";

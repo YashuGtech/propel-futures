@@ -1,3 +1,4 @@
+import { useShallow } from "zustand/react/shallow";
 import { Link, useRouter, useRouterState } from "@tanstack/react-router";
 import { motion } from "framer-motion";
 import {

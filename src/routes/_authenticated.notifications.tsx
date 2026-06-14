@@ -1,3 +1,4 @@
+import { useShallow } from "zustand/react/shallow";
 import { createFileRoute } from "@tanstack/react-router";
 import { useStore } from "@/lib/store";
 import { Bell, CheckCircle2, AlertTriangle, Info, XCircle, Check } from "lucide-react";
