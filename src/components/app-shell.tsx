@@ -37,11 +37,11 @@ const NAV = [
 export function AppShell({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
-  const user = useStore((s) => s.currentUser());
+  const user = useStore(useShallow((s) => s.currentUser()));
   const logout = useStore((s) => s.logout);
-  const notifs = useStore((s) =>
+  const notifs = useStore(useShallow((s) =>
     s.notifications.filter((n) => n.userId === s.currentUserId && !n.read)
-  );
+  ));
 
   return (
     <div className="min-h-screen text-foreground">

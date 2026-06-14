@@ -13,7 +13,7 @@ export const Route = createFileRoute("/_authenticated/accounts")({
 });
 
 function Accounts() {
-  const accounts = useStore((s) => s.accounts.filter((a) => a.userId === s.currentUserId));
+  const accounts = useStore(useShallow((s) => s.accounts.filter((a) => a.userId === s.currentUserId)));
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">

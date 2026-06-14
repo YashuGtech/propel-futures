@@ -12,9 +12,9 @@ export const Route = createFileRoute("/_authenticated/dashboard")({
 });
 
 function Dashboard() {
-  const user = useStore((s) => s.currentUser());
-  const accounts = useStore((s) => s.accounts.filter((a) => a.userId === s.currentUserId));
-  const trades = useStore((s) => s.trades.filter((t) => accounts.some((a) => a.id === t.accountId)));
+  const user = useStore(useShallow((s) => s.currentUser()));
+  const accounts = useStore(useShallow((s) => s.accounts.filter((a) => a.userId === s.currentUserId)));
+  const trades = useStore(useShallow((s) => s.trades.filter((t) => accounts.some((a) => a.id === t.accountId))));
   const totalEquity = accounts.reduce((sum, a) => sum + a.equity, 0);
   const totalPnL = accounts.reduce((sum, a) => sum + (a.equity - a.startBalance), 0);
   const openTrades = trades.filter((t) => t.status === "open");

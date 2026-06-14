@@ -16,10 +16,10 @@ export const Route = createFileRoute("/_authenticated/terminal")({
 type Candle = { t: number; o: number; h: number; l: number; c: number };
 
 function Terminal() {
-  const accounts = useStore((s) => s.accounts.filter((a) => a.userId === s.currentUserId && a.status === "active"));
+  const accounts = useStore(useShallow((s) => s.accounts.filter((a) => a.userId === s.currentUserId && a.status === "active")));
   const [accountId, setAccountId] = useState(accounts[0]?.id ?? "");
   const account = accounts.find((a) => a.id === accountId) ?? accounts[0];
-  const trades = useStore((s) => s.trades.filter((t) => t.accountId === account?.id));
+  const trades = useStore(useShallow((s) => s.trades.filter((t) => t.accountId === account?.id)));
   const openTrade = useStore((s) => s.openTrade);
   const closeTrade = useStore((s) => s.closeTrade);
   const updateOpenPnL = useStore((s) => s.updateOpenPnL);

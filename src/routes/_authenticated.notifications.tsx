@@ -10,7 +10,7 @@ export const Route = createFileRoute("/_authenticated/notifications")({
 
 function Notifications() {
   const userId = useStore((s) => s.currentUserId);
-  const list = useStore((s) => s.notifications.filter((n) => n.userId === userId).sort((a, b) => b.createdAt - a.createdAt));
+  const list = useStore(useShallow((s) => s.notifications.filter((n) => n.userId === userId).sort((a, b) => b.createdAt - a.createdAt)));
   const markAll = useStore((s) => s.markAllRead);
 
   const iconFor = (t: string) => t === "success" ? CheckCircle2 : t === "warning" ? AlertTriangle : t === "error" ? XCircle : Info;
