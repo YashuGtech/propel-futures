@@ -22,11 +22,11 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 
 const NAV = [
-  { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
-  { to: "/challenges", label: "Marketplace", icon: ShoppingBag },
-  { to: "/accounts", label: "My Accounts", icon: Wallet },
-  { to: "/terminal", label: "Trading Terminal", icon: LineChart },
-  { to: "/deposits", label: "Deposits", icon: ArrowDownToLine },
+  { to: "/dashboard", label: "Dashboard", mobileLabel: "Home", icon: LayoutDashboard },
+  { to: "/challenges", label: "Marketplace", mobileLabel: "Buy", icon: ShoppingBag },
+  { to: "/accounts", label: "My Accounts", mobileLabel: "Accounts", icon: Wallet },
+  { to: "/terminal", label: "Trading Terminal", mobileLabel: "Trade", icon: LineChart },
+  { to: "/deposits", label: "Deposits", mobileLabel: "Deposit", icon: ArrowDownToLine },
   { to: "/withdrawals", label: "Withdrawals", icon: ArrowUpFromLine },
   { to: "/referrals", label: "Referrals", icon: Users },
   { to: "/reports", label: "Reports", icon: BarChart3 },
@@ -144,19 +144,19 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.35 }}
-            className="p-4 lg:p-8"
+            className="p-4 pb-28 lg:p-8 lg:pb-8"
           >
             {children}
           </motion.main>
 
           {/* Mobile bottom nav */}
-          <nav className="lg:hidden fixed bottom-0 inset-x-0 z-30 glass-strong border-t border-white/10 flex justify-around p-2">
-            {NAV.slice(0, 5).map(({ to, label, icon: Icon }) => {
+          <nav className="lg:hidden fixed bottom-0 inset-x-0 z-30 glass-strong border-t border-white/10 flex justify-around px-1.5 pt-2 pb-[calc(0.5rem+env(safe-area-inset-bottom))]">
+            {NAV.slice(0, 5).map(({ to, label, mobileLabel, icon: Icon }) => {
               const active = pathname === to;
               return (
-                <Link key={to} to={to} className={`flex flex-col items-center gap-1 px-2 py-1 ${active ? "text-cyan" : "text-muted-foreground"}`}>
+                <Link key={to} to={to} className={`flex min-w-0 flex-1 flex-col items-center gap-1 px-1 py-1 ${active ? "text-cyan" : "text-muted-foreground"}`}>
                   <Icon className="h-5 w-5" />
-                  <span className="text-[10px]">{label}</span>
+                  <span className="max-w-full truncate text-[9px] leading-none">{mobileLabel ?? label}</span>
                 </Link>
               );
             })}
