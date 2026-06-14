@@ -1,6 +1,7 @@
 import { useShallow } from "zustand/react/shallow";
 import { Link, useRouter, useRouterState } from "@tanstack/react-router";
 import { motion } from "framer-motion";
+import { useMemo } from "react";
 import {
   LayoutDashboard,
   ShoppingBag,
@@ -37,11 +38,11 @@ const NAV = [
 export function AppShell({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
-  const user = useStore(useShallow((s) => s.currentUser()));
+  const userId = useStore((s) => s.currentUserId);
+  const users = useStore((s) => s.users);
+  const user = useMemo(() => users.find((u) => u.id === userId) ?? null, [users, userId]);
   const logout = useStore((s) => s.logout);
-  const notifs = useStore(useShallow((s) =>
-    s.notifications.filter((n) => n.userId === s.currentUserId && !n.read)
-  ));
+  const unreadCount = useStore((s) => s.notifications.reduce((count, n) => count + (n.userId === s.currentUserId && !n.read ? 1 : 0), 0));
 
   return (
     <div className="min-h-screen text-foreground">
@@ -75,8 +76,8 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                 >
                   <Icon className={`h-4 w-4 ${active ? "text-cyan" : ""}`} />
                   <span className="flex-1">{label}</span>
-                  {to === "/notifications" && notifs.length > 0 && (
-                    <Badge className="h-5 px-1.5 bg-destructive text-destructive-foreground">{notifs.length}</Badge>
+                  {to === "/notifications" && unreadCount > 0 && (
+                    <Badge className="h-5 px-1.5 bg-destructive text-destructive-foreground">{unreadCount}</Badge>
                   )}
                 </Link>
               );
@@ -126,7 +127,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               <div className="flex-1 lg:hidden" />
               <Link to="/notifications" className="relative p-2 rounded-lg hover:bg-white/5">
                 <Bell className="h-5 w-5" />
-                {notifs.length > 0 && <span className="absolute top-1.5 right-1.5 h-2 w-2 rounded-full bg-destructive anim-pulse-glow" />}
+                {unreadCount > 0 && <span className="absolute top-1.5 right-1.5 h-2 w-2 rounded-full bg-destructive anim-pulse-glow" />}
               </Link>
               <Link
                 to="/challenges"
