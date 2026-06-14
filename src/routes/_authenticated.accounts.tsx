@@ -1,4 +1,3 @@
-import { useShallow } from "zustand/react/shallow";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useStore } from "@/lib/store";
 import { PhaseBadge } from "./_authenticated.dashboard";
