@@ -14,12 +14,16 @@ export const Route = createFileRoute("/auth")({
 function AuthPage() {
   const [mode, setMode] = useState<"login" | "signup">("signup");
   const navigate = useNavigate();
-  const { signup, login } = useStore();
+  const signup = useStore((s) => s.signup);
+  const login = useStore((s) => s.login);
   const [form, setForm] = useState({ name: "", email: "", password: "", ref: "" });
+  const [agreed, setAgreed] = useState(false);
 
   const submit = (e: React.FormEvent) => {
     e.preventDefault();
     if (mode === "signup") {
+      if (!agreed) return toast.error("Please agree to the Terms & Conditions to continue");
+      if (!form.email || form.password.length < 6) return toast.error("Enter a valid email and 6+ char password");
       const r = signup(form.email, form.password, form.name || form.email.split("@")[0], form.ref);
       if (!r.ok) return toast.error(r.error);
       toast.success("Account created — $100 welcome bonus applied 🎉");
