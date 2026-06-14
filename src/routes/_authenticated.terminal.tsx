@@ -1,4 +1,3 @@
-import { useShallow } from "zustand/react/shallow";
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { INSTRUMENTS } from "@/lib/mock-data";
@@ -16,10 +15,13 @@ export const Route = createFileRoute("/_authenticated/terminal")({
 type Candle = { t: number; o: number; h: number; l: number; c: number };
 
 function Terminal() {
-  const accounts = useStore(useShallow((s) => s.accounts.filter((a) => a.userId === s.currentUserId && a.status === "active")));
+  const userId = useStore((s) => s.currentUserId);
+  const allAccounts = useStore((s) => s.accounts);
+  const allTrades = useStore((s) => s.trades);
+  const accounts = useMemo(() => allAccounts.filter((a) => a.userId === userId && a.status === "active"), [allAccounts, userId]);
   const [accountId, setAccountId] = useState(accounts[0]?.id ?? "");
   const account = accounts.find((a) => a.id === accountId) ?? accounts[0];
-  const trades = useStore(useShallow((s) => s.trades.filter((t) => t.accountId === account?.id)));
+  const trades = useMemo(() => allTrades.filter((t) => t.accountId === account?.id), [allTrades, account?.id]);
   const openTrade = useStore((s) => s.openTrade);
   const closeTrade = useStore((s) => s.closeTrade);
   const updateOpenPnL = useStore((s) => s.updateOpenPnL);
@@ -29,6 +31,12 @@ function Terminal() {
   const [prices, setPrices] = useState<Record<string, number>>(() => Object.fromEntries(INSTRUMENTS.map((i) => [i.symbol, i.basePrice])));
   const [candles, setCandles] = useState<Record<string, Candle[]>>({});
   const [showIndicators, setShowIndicators] = useState({ sma: true, ema: false, bb: false });
+
+  useEffect(() => {
+    if (accounts.length && (!accountId || !accounts.some((a) => a.id === accountId))) {
+      setAccountId(accounts[0].id);
+    }
+  }, [accounts, accountId]);
 
   // Initialize candles per symbol
   useEffect(() => {
@@ -149,9 +157,10 @@ function Terminal() {
   }
 
   const curPrice = prices[symbol] ?? inst.basePrice;
+  const openPositions = trades.filter((t) => t.status === "open");
 
   return (
-    <div className="grid grid-cols-12 gap-4 h-[calc(100vh-9rem)] pb-20 lg:pb-0">
+    <div className="grid grid-cols-12 gap-4 min-h-[calc(100vh-9rem)] lg:h-[calc(100vh-9rem)] pb-24 lg:pb-0">
       {/* Market Watch */}
       <div className="col-span-12 lg:col-span-3 glass rounded-2xl p-3 flex flex-col">
         <div className="flex items-center gap-2 glass rounded-lg px-3 py-2 mb-2">
@@ -228,7 +237,7 @@ function Terminal() {
                 <Tooltip contentStyle={{ background: "oklch(0.18 0.025 265)", border: "1px solid oklch(1 0 0 / 10%)", borderRadius: 12 }} formatter={(v: number) => v.toFixed(inst.digits)} />
                 <Area type="monotone" dataKey="v" stroke="oklch(0.72 0.18 220)" strokeWidth={2} fill="url(#px)" />
                 {showIndicators.sma && <Area type="monotone" dataKey="sma" stroke="oklch(0.82 0.14 85)" strokeWidth={1.5} fill="transparent" dot={false} />}
-                {trades.filter((t) => t.status === "open" && t.symbol === symbol).map((t) => (
+                {openPositions.filter((t) => t.symbol === symbol).map((t) => (
                   <ReferenceLine key={t.id} y={t.openPrice} stroke={t.side === "buy" ? "oklch(0.72 0.18 155)" : "oklch(0.65 0.24 25)"} strokeDasharray="4 4" />
                 ))}
               </AreaChart>
@@ -238,13 +247,14 @@ function Terminal() {
 
         {/* Positions */}
         <div className="glass rounded-2xl p-4 max-h-56 overflow-y-auto scrollbar-thin">
-          <div className="text-sm font-semibold mb-3">Open Positions ({trades.filter((t) => t.status === "open").length})</div>
-          <table className="w-full text-xs">
+          <div className="text-sm font-semibold mb-3">Open Positions ({openPositions.length})</div>
+          <div className="overflow-x-auto">
+          <table className="w-full min-w-[520px] text-xs">
             <thead className="text-muted-foreground">
               <tr><th className="text-left">Symbol</th><th>Side</th><th className="text-right">Lots</th><th className="text-right">Open</th><th className="text-right">Cur</th><th className="text-right">P&L</th><th></th></tr>
             </thead>
             <tbody>
-              {trades.filter((t) => t.status === "open").map((t) => (
+              {openPositions.map((t) => (
                 <tr key={t.id} className="border-t border-white/5">
                   <td className="font-mono py-2">{t.symbol}</td>
                   <td className="text-center">{t.side === "buy" ? <TrendingUp className="h-3 w-3 text-success inline" /> : <TrendingDown className="h-3 w-3 text-destructive inline" />}</td>
@@ -255,11 +265,12 @@ function Terminal() {
                   <td><button onClick={() => closeTrade(t.id, prices[t.symbol])} className="p-1 hover:bg-destructive/20 rounded text-destructive"><X className="h-3 w-3" /></button></td>
                 </tr>
               ))}
-              {trades.filter((t) => t.status === "open").length === 0 && (
+              {openPositions.length === 0 && (
                 <tr><td colSpan={7} className="text-center text-muted-foreground py-4">No open positions</td></tr>
               )}
             </tbody>
           </table>
+          </div>
         </div>
       </div>
 

@@ -1,6 +1,6 @@
-import { useShallow } from "zustand/react/shallow";
 import { Link, useRouter, useRouterState } from "@tanstack/react-router";
 import { motion } from "framer-motion";
+import { useMemo } from "react";
 import {
   LayoutDashboard,
   ShoppingBag,
@@ -22,26 +22,26 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 
 const NAV = [
-  { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
-  { to: "/challenges", label: "Marketplace", icon: ShoppingBag },
-  { to: "/accounts", label: "My Accounts", icon: Wallet },
-  { to: "/terminal", label: "Trading Terminal", icon: LineChart },
-  { to: "/deposits", label: "Deposits", icon: ArrowDownToLine },
-  { to: "/withdrawals", label: "Withdrawals", icon: ArrowUpFromLine },
-  { to: "/referrals", label: "Referrals", icon: Users },
-  { to: "/reports", label: "Reports", icon: BarChart3 },
-  { to: "/notifications", label: "Notifications", icon: Bell },
-  { to: "/admin", label: "Admin", icon: Shield },
+  { to: "/dashboard", label: "Dashboard", mobileLabel: "Home", icon: LayoutDashboard },
+  { to: "/challenges", label: "Marketplace", mobileLabel: "Buy", icon: ShoppingBag },
+  { to: "/accounts", label: "My Accounts", mobileLabel: "Accounts", icon: Wallet },
+  { to: "/terminal", label: "Trading Terminal", mobileLabel: "Trade", icon: LineChart },
+  { to: "/deposits", label: "Deposits", mobileLabel: "Deposit", icon: ArrowDownToLine },
+  { to: "/withdrawals", label: "Withdrawals", mobileLabel: "Payout", icon: ArrowUpFromLine },
+  { to: "/referrals", label: "Referrals", mobileLabel: "Refer", icon: Users },
+  { to: "/reports", label: "Reports", mobileLabel: "Reports", icon: BarChart3 },
+  { to: "/notifications", label: "Notifications", mobileLabel: "Alerts", icon: Bell },
+  { to: "/admin", label: "Admin", mobileLabel: "Admin", icon: Shield },
 ] as const;
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
-  const user = useStore(useShallow((s) => s.currentUser()));
+  const userId = useStore((s) => s.currentUserId);
+  const users = useStore((s) => s.users);
+  const user = useMemo(() => users.find((u) => u.id === userId) ?? null, [users, userId]);
   const logout = useStore((s) => s.logout);
-  const notifs = useStore(useShallow((s) =>
-    s.notifications.filter((n) => n.userId === s.currentUserId && !n.read)
-  ));
+  const unreadCount = useStore((s) => s.notifications.reduce((count, n) => count + (n.userId === s.currentUserId && !n.read ? 1 : 0), 0));
 
   return (
     <div className="min-h-screen text-foreground">
@@ -75,8 +75,8 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                 >
                   <Icon className={`h-4 w-4 ${active ? "text-cyan" : ""}`} />
                   <span className="flex-1">{label}</span>
-                  {to === "/notifications" && notifs.length > 0 && (
-                    <Badge className="h-5 px-1.5 bg-destructive text-destructive-foreground">{notifs.length}</Badge>
+                  {to === "/notifications" && unreadCount > 0 && (
+                    <Badge className="h-5 px-1.5 bg-destructive text-destructive-foreground">{unreadCount}</Badge>
                   )}
                 </Link>
               );
@@ -126,7 +126,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               <div className="flex-1 lg:hidden" />
               <Link to="/notifications" className="relative p-2 rounded-lg hover:bg-white/5">
                 <Bell className="h-5 w-5" />
-                {notifs.length > 0 && <span className="absolute top-1.5 right-1.5 h-2 w-2 rounded-full bg-destructive anim-pulse-glow" />}
+                {unreadCount > 0 && <span className="absolute top-1.5 right-1.5 h-2 w-2 rounded-full bg-destructive anim-pulse-glow" />}
               </Link>
               <Link
                 to="/challenges"
@@ -144,19 +144,19 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.35 }}
-            className="p-4 lg:p-8"
+            className="p-4 pb-28 lg:p-8 lg:pb-8"
           >
             {children}
           </motion.main>
 
           {/* Mobile bottom nav */}
-          <nav className="lg:hidden fixed bottom-0 inset-x-0 z-30 glass-strong border-t border-white/10 flex justify-around p-2">
-            {NAV.slice(0, 5).map(({ to, label, icon: Icon }) => {
+          <nav className="lg:hidden fixed bottom-0 inset-x-0 z-30 glass-strong border-t border-white/10 flex justify-around px-1.5 pt-2 pb-[calc(0.5rem+env(safe-area-inset-bottom))]">
+            {NAV.slice(0, 5).map(({ to, label, mobileLabel, icon: Icon }) => {
               const active = pathname === to;
               return (
-                <Link key={to} to={to} className={`flex flex-col items-center gap-1 px-2 py-1 ${active ? "text-cyan" : "text-muted-foreground"}`}>
+                <Link key={to} to={to} className={`flex min-w-0 flex-1 flex-col items-center gap-1 px-1 py-1 ${active ? "text-cyan" : "text-muted-foreground"}`}>
                   <Icon className="h-5 w-5" />
-                  <span className="text-[10px]">{label}</span>
+                  <span className="max-w-full truncate text-[9px] leading-none">{mobileLabel ?? label}</span>
                 </Link>
               );
             })}

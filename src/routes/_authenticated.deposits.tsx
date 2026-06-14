@@ -1,6 +1,5 @@
-import { useShallow } from "zustand/react/shallow";
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useStore } from "@/lib/store";
 import { CRYPTO_ADDRESSES } from "@/lib/mock-data";
 import { toast } from "sonner";
@@ -13,7 +12,8 @@ export const Route = createFileRoute("/_authenticated/deposits")({
 
 function Deposits() {
   const userId = useStore((s) => s.currentUserId)!;
-  const deposits = useStore(useShallow((s) => s.deposits.filter((d) => d.userId === userId)));
+  const allDeposits = useStore((s) => s.deposits);
+  const deposits = useMemo(() => allDeposits.filter((d) => d.userId === userId), [allDeposits, userId]);
   const create = useStore((s) => s.createDeposit);
   const [amount, setAmount] = useState(100);
   const [asset, setAsset] = useState<keyof typeof CRYPTO_ADDRESSES>("USDT_TRC20");

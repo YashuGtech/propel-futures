@@ -1,6 +1,6 @@
-import { useShallow } from "zustand/react/shallow";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { motion } from "framer-motion";
+import { useMemo } from "react";
 import { StatCard } from "@/components/app-shell";
 import { useStore } from "@/lib/store";
 import { TrendingUp, TrendingDown, Activity, Target, Sparkles, ArrowRight, Gift } from "lucide-react";
@@ -12,9 +12,14 @@ export const Route = createFileRoute("/_authenticated/dashboard")({
 });
 
 function Dashboard() {
-  const user = useStore(useShallow((s) => s.currentUser()));
-  const accounts = useStore(useShallow((s) => s.accounts.filter((a) => a.userId === s.currentUserId)));
-  const trades = useStore(useShallow((s) => s.trades.filter((t) => accounts.some((a) => a.id === t.accountId))));
+  const userId = useStore((s) => s.currentUserId);
+  const users = useStore((s) => s.users);
+  const allAccounts = useStore((s) => s.accounts);
+  const allTrades = useStore((s) => s.trades);
+  const user = useMemo(() => users.find((u) => u.id === userId) ?? null, [users, userId]);
+  const accounts = useMemo(() => allAccounts.filter((a) => a.userId === userId), [allAccounts, userId]);
+  const accountIds = useMemo(() => new Set(accounts.map((a) => a.id)), [accounts]);
+  const trades = useMemo(() => allTrades.filter((t) => accountIds.has(t.accountId)), [allTrades, accountIds]);
   const totalEquity = accounts.reduce((sum, a) => sum + a.equity, 0);
   const totalPnL = accounts.reduce((sum, a) => sum + (a.equity - a.startBalance), 0);
   const openTrades = trades.filter((t) => t.status === "open");

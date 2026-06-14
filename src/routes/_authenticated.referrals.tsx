@@ -1,5 +1,5 @@
-import { useShallow } from "zustand/react/shallow";
 import { createFileRoute } from "@tanstack/react-router";
+import { useMemo } from "react";
 import { useStore } from "@/lib/store";
 import { Copy, Share2, Users, DollarSign, Gift } from "lucide-react";
 import { toast } from "sonner";
@@ -10,9 +10,11 @@ export const Route = createFileRoute("/_authenticated/referrals")({
 });
 
 function Referrals() {
-  const user = useStore(useShallow((s) => s.currentUser()));
-  const referrals = useStore(useShallow((s) => s.referrals.filter((r) => r.referrerId === user?.id)));
+  const userId = useStore((s) => s.currentUserId);
   const users = useStore((s) => s.users);
+  const allReferrals = useStore((s) => s.referrals);
+  const user = useMemo(() => users.find((u) => u.id === userId) ?? null, [users, userId]);
+  const referrals = useMemo(() => allReferrals.filter((r) => r.referrerId === userId), [allReferrals, userId]);
   const totalEarned = referrals.reduce((sum, r) => sum + r.reward, 0);
 
   const link = typeof window !== "undefined" ? `${window.location.origin}/auth?ref=${user?.referralCode}` : "";
