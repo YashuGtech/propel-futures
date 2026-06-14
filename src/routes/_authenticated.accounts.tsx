@@ -4,7 +4,7 @@ import { useStore } from "@/lib/store";
 import { PhaseBadge } from "./_authenticated.dashboard";
 import { Progress } from "@/components/ui/progress";
 import { Copy, Eye, EyeOff } from "lucide-react";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/accounts")({
@@ -13,7 +13,9 @@ export const Route = createFileRoute("/_authenticated/accounts")({
 });
 
 function Accounts() {
-  const accounts = useStore(useShallow((s) => s.accounts.filter((a) => a.userId === s.currentUserId)));
+  const userId = useStore((s) => s.currentUserId);
+  const allAccounts = useStore((s) => s.accounts);
+  const accounts = useMemo(() => allAccounts.filter((a) => a.userId === userId), [allAccounts, userId]);
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
