@@ -247,13 +247,14 @@ function Terminal() {
 
         {/* Positions */}
         <div className="glass rounded-2xl p-4 max-h-56 overflow-y-auto scrollbar-thin">
-          <div className="text-sm font-semibold mb-3">Open Positions ({trades.filter((t) => t.status === "open").length})</div>
-          <table className="w-full text-xs">
+          <div className="text-sm font-semibold mb-3">Open Positions ({openPositions.length})</div>
+          <div className="overflow-x-auto">
+          <table className="w-full min-w-[520px] text-xs">
             <thead className="text-muted-foreground">
               <tr><th className="text-left">Symbol</th><th>Side</th><th className="text-right">Lots</th><th className="text-right">Open</th><th className="text-right">Cur</th><th className="text-right">P&L</th><th></th></tr>
             </thead>
             <tbody>
-              {trades.filter((t) => t.status === "open").map((t) => (
+              {openPositions.map((t) => (
                 <tr key={t.id} className="border-t border-white/5">
                   <td className="font-mono py-2">{t.symbol}</td>
                   <td className="text-center">{t.side === "buy" ? <TrendingUp className="h-3 w-3 text-success inline" /> : <TrendingDown className="h-3 w-3 text-destructive inline" />}</td>
@@ -264,11 +265,12 @@ function Terminal() {
                   <td><button onClick={() => closeTrade(t.id, prices[t.symbol])} className="p-1 hover:bg-destructive/20 rounded text-destructive"><X className="h-3 w-3" /></button></td>
                 </tr>
               ))}
-              {trades.filter((t) => t.status === "open").length === 0 && (
+              {openPositions.length === 0 && (
                 <tr><td colSpan={7} className="text-center text-muted-foreground py-4">No open positions</td></tr>
               )}
             </tbody>
           </table>
+          </div>
         </div>
       </div>
 
