@@ -14,12 +14,16 @@ export const Route = createFileRoute("/auth")({
 function AuthPage() {
   const [mode, setMode] = useState<"login" | "signup">("signup");
   const navigate = useNavigate();
-  const { signup, login } = useStore();
+  const signup = useStore((s) => s.signup);
+  const login = useStore((s) => s.login);
   const [form, setForm] = useState({ name: "", email: "", password: "", ref: "" });
+  const [agreed, setAgreed] = useState(false);
 
   const submit = (e: React.FormEvent) => {
     e.preventDefault();
     if (mode === "signup") {
+      if (!agreed) return toast.error("Please agree to the Terms & Conditions to continue");
+      if (!form.email || form.password.length < 6) return toast.error("Enter a valid email and 6+ char password");
       const r = signup(form.email, form.password, form.name || form.email.split("@")[0], form.ref);
       if (!r.ok) return toast.error(r.error);
       toast.success("Account created — $100 welcome bonus applied 🎉");
@@ -65,7 +69,24 @@ function AuthPage() {
           {mode === "signup" && (
             <Field icon={Sparkles} placeholder="Referral code (optional)" value={form.ref} onChange={(v: string) => setForm({ ...form, ref: v })} />
           )}
-          <button type="submit" className="w-full py-3 rounded-xl gradient-cyan-violet text-background font-semibold glow-cyan">
+          {mode === "signup" && (
+            <label className="flex items-start gap-2 text-xs text-muted-foreground cursor-pointer select-none pt-1">
+              <input
+                type="checkbox"
+                checked={agreed}
+                onChange={(e) => setAgreed(e.target.checked)}
+                className="mt-0.5 h-4 w-4 accent-cyan-500 rounded border-white/20 bg-transparent"
+              />
+              <span>
+                I agree to the <a href="#" className="text-cyan underline underline-offset-2">Terms & Conditions</a> and <a href="#" className="text-cyan underline underline-offset-2">Privacy Policy</a>.
+              </span>
+            </label>
+          )}
+          <button
+            type="submit"
+            disabled={mode === "signup" && !agreed}
+            className="w-full py-3 rounded-xl gradient-cyan-violet text-background font-semibold glow-cyan disabled:opacity-50 disabled:cursor-not-allowed"
+          >
             {mode === "signup" ? "Create account & claim $100" : "Log in"}
           </button>
         </form>

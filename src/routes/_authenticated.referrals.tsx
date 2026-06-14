@@ -1,3 +1,4 @@
+import { useShallow } from "zustand/react/shallow";
 import { createFileRoute } from "@tanstack/react-router";
 import { useStore } from "@/lib/store";
 import { Copy, Share2, Users, DollarSign, Gift } from "lucide-react";
@@ -9,8 +10,8 @@ export const Route = createFileRoute("/_authenticated/referrals")({
 });
 
 function Referrals() {
-  const user = useStore((s) => s.currentUser());
-  const referrals = useStore((s) => s.referrals.filter((r) => r.referrerId === user?.id));
+  const user = useStore(useShallow((s) => s.currentUser()));
+  const referrals = useStore(useShallow((s) => s.referrals.filter((r) => r.referrerId === user?.id)));
   const users = useStore((s) => s.users);
   const totalEarned = referrals.reduce((sum, r) => sum + r.reward, 0);
 

@@ -1,3 +1,4 @@
+import { useShallow } from "zustand/react/shallow";
 import { createFileRoute } from "@tanstack/react-router";
 import { useStore } from "@/lib/store";
 import { Area, AreaChart, Bar, BarChart, CartesianGrid, Cell, Pie, PieChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
@@ -9,10 +10,10 @@ export const Route = createFileRoute("/_authenticated/reports")({
 
 function Reports() {
   const userId = useStore((s) => s.currentUserId);
-  const trades = useStore((s) => s.trades.filter((t) => {
+  const trades = useStore(useShallow((s) => s.trades.filter((t) => {
     const acc = s.accounts.find((a) => a.id === t.accountId);
     return acc?.userId === userId;
-  }));
+  })));
   const closed = trades.filter((t) => t.status === "closed");
   const wins = closed.filter((t) => t.pnl > 0);
   const losses = closed.filter((t) => t.pnl <= 0);

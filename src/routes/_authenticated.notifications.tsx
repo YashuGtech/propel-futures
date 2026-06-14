@@ -1,3 +1,4 @@
+import { useShallow } from "zustand/react/shallow";
 import { createFileRoute } from "@tanstack/react-router";
 import { useStore } from "@/lib/store";
 import { Bell, CheckCircle2, AlertTriangle, Info, XCircle, Check } from "lucide-react";
@@ -9,7 +10,7 @@ export const Route = createFileRoute("/_authenticated/notifications")({
 
 function Notifications() {
   const userId = useStore((s) => s.currentUserId);
-  const list = useStore((s) => s.notifications.filter((n) => n.userId === userId).sort((a, b) => b.createdAt - a.createdAt));
+  const list = useStore(useShallow((s) => s.notifications.filter((n) => n.userId === userId).sort((a, b) => b.createdAt - a.createdAt)));
   const markAll = useStore((s) => s.markAllRead);
 
   const iconFor = (t: string) => t === "success" ? CheckCircle2 : t === "warning" ? AlertTriangle : t === "error" ? XCircle : Info;

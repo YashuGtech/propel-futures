@@ -1,3 +1,4 @@
+import { useShallow } from "zustand/react/shallow";
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { useStore } from "@/lib/store";
@@ -12,8 +13,8 @@ export const Route = createFileRoute("/_authenticated/withdrawals")({
 
 function Withdrawals() {
   const userId = useStore((s) => s.currentUserId)!;
-  const accounts = useStore((s) => s.accounts.filter((a) => a.userId === userId));
-  const withdrawals = useStore((s) => s.withdrawals.filter((w) => w.userId === userId));
+  const accounts = useStore(useShallow((s) => s.accounts.filter((a) => a.userId === userId)));
+  const withdrawals = useStore(useShallow((s) => s.withdrawals.filter((w) => w.userId === userId)));
   const create = useStore((s) => s.createWithdrawal);
   const [accountId, setAccountId] = useState(accounts[0]?.id ?? "");
   const [amount, setAmount] = useState(50);
