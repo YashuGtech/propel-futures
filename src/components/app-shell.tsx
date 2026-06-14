@@ -27,11 +27,11 @@ const NAV = [
   { to: "/accounts", label: "My Accounts", mobileLabel: "Accounts", icon: Wallet },
   { to: "/terminal", label: "Trading Terminal", mobileLabel: "Trade", icon: LineChart },
   { to: "/deposits", label: "Deposits", mobileLabel: "Deposit", icon: ArrowDownToLine },
-  { to: "/withdrawals", label: "Withdrawals", icon: ArrowUpFromLine },
-  { to: "/referrals", label: "Referrals", icon: Users },
-  { to: "/reports", label: "Reports", icon: BarChart3 },
-  { to: "/notifications", label: "Notifications", icon: Bell },
-  { to: "/admin", label: "Admin", icon: Shield },
+  { to: "/withdrawals", label: "Withdrawals", mobileLabel: "Payout", icon: ArrowUpFromLine },
+  { to: "/referrals", label: "Referrals", mobileLabel: "Refer", icon: Users },
+  { to: "/reports", label: "Reports", mobileLabel: "Reports", icon: BarChart3 },
+  { to: "/notifications", label: "Notifications", mobileLabel: "Alerts", icon: Bell },
+  { to: "/admin", label: "Admin", mobileLabel: "Admin", icon: Shield },
 ] as const;
 
 export function AppShell({ children }: { children: React.ReactNode }) {
